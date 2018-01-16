@@ -4,6 +4,14 @@
 
 A light wrapper around pymongo and pyjo to easily interact with MongoDB documents. See the following example.
 
+## Install
+
+```
+pip install pyjo_mongo
+```
+
+## How to use
+
 ```python
 from pymongo import MongoClient
 from pyjo import Model, Field, RangeField, EnumField
