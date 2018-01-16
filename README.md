@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/marcopaz/pyjo.svg?branch=master)](https://travis-ci.org/marcopaz/pyjo_mongo)
+[![Build Status](https://travis-ci.org/marcopaz/pyjo_mongo.svg?branch=master)](https://travis-ci.org/marcopaz/pyjo_mongo)
 
 # pyjo_mongo
 
@@ -10,6 +10,7 @@ from pyjo import Model, Field, RangeField, EnumField
 from pyjo_mongo import Document
 
 db_connection = MongoClient(MONGODB_URL)[DB_NAME]
+
 
 class Gender(Enum):
     female = 0
@@ -23,7 +24,6 @@ class Address(Model):
 
 
 class User(Document):
-
     __meta__ = {
         'db_connection': lambda: db_connection,
         'collection_name': 'users',
@@ -54,16 +54,17 @@ u.save()
 u.id
 # ObjectId('5a5ca86080a9b8291874f4db')
 
-w = User.find_one({'username': 'mp'})
-w.gender = Gender.male
-w.save()
+u2 = User.find_one({'username': 'mp'})
+u2.gender = Gender.male
+u2.save()
 
 u.reload()
 u.gender
 # Gender.male
 
 # queries use the same syntax of pymongo and automatically return pyjo data models
-for u in User.find({'active': True}):
-    print(u)
+for user in User.find({'active': True}):
+    print(user)
+# <User(username=mp)>
 ```
 
