@@ -7,7 +7,7 @@ class Document(Model):
     __meta__ = {}
     _indexes_created = False
 
-    _id = Field(type=ObjectId)
+    _id = Field(type=ObjectId, repr=True)
 
     @property
     def id(self):
