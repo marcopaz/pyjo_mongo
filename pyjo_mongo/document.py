@@ -75,6 +75,7 @@ class Document(Model):
     def save(self):
         _id = self._get_collection().save(self.to_dict())
         self._id = _id
+        return self
 
     def reload(self):
         if not self._id:
