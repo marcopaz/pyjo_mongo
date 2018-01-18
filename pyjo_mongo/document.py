@@ -85,6 +85,18 @@ class Document(Model):
         return self.update_from_dict(doc)
 
     @classmethod
+    def with_id(cls, id):
+        id = ObjectId(id) if not isinstance(id, ObjectId) else id
+        return cls.find_one({'_id': id})
+
+    @classmethod
+    def with_ids(cls, ids):
+        if not isinstance(ids, list):
+            raise Exception('argument must be a list')
+        ids = [ObjectId(id) if not isinstance(id, ObjectId) else id for id in ids]
+        return cls.find({'_id': {'$in': ids}})
+
+    @classmethod
     def find(cls, *args, **kwargs):
         docs = cls._get_collection().find(*args, **kwargs)
         for doc in docs:
