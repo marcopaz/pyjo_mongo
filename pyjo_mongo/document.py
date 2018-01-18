@@ -37,7 +37,6 @@ class Document(Model):
         all_background = cls.__meta__.get('index_background', False)
 
         mongo_indexes = []
-        declared_fields = set(cls._get_fields())
 
         for index in indexes:
             kwargs = {}
@@ -57,14 +56,13 @@ class Document(Model):
                 if not isinstance(field, str):
                     raise Exception('invalid index field')
                 if field[0] == '-':
-                    mongo_fields.append((field[1:], pymongo.DESCENDING))
+                    field = field[1:]
+                    mongo_fields.append((field, pymongo.DESCENDING))
                 else:
                     mongo_fields.append((field, pymongo.ASCENDING))
 
-            if check_if_fields_exist:
-                for field, _ in mongo_fields:
-                    if field not in declared_fields:
-                        raise Exception('Field "{}" used in index is not declared in the model'.format(field))
+                if check_if_fields_exist and field not in cls._fields:
+                    raise Exception('Field "{}" used in index is not declared in the model'.format(field))
 
             mongo_indexes.append(pymongo.IndexModel(
                 mongo_fields,
