@@ -50,7 +50,7 @@ class User(Document):
     last_name = Field(type=str)
     age = RangeField(min=18, max=120)
     gender = EnumField(enum=Gender)
-    address = Field(type=Address, allow_none=True)
+    address = Field(type=Address)
     active = Field(type=bool, default=True)
 ```
 
