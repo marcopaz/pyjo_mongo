@@ -105,6 +105,13 @@ class Document(Model):
 
     @classmethod
     def find_one(cls, *args, **kwargs):
+        """
+        Finds and returns a single instance of the requested document class, matching the criteria provided
+        :param args: args sent to Mongo for filtering
+        :param kwargs: kwargs sent to Mongo for filtering
+        :return: The instance of document class requested or None, if not found
+        :rtype: cls
+        """
         doc = cls._get_collection().find_one(*args, **kwargs)
         if not doc:
             return doc
