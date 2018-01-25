@@ -77,6 +77,11 @@ class Document(Model):
         self._id = _id
         return self
 
+    def delete(self):
+        self._get_collection().delete_one(self.to_dict())
+        self._id = None
+        return self
+
     def reload(self):
         if not self._id:
             raise Exception('called reload on a document without _id')
