@@ -24,7 +24,7 @@ class DocManager(object):
         if not isinstance(ids, list):
             raise Exception('argument must be a list')
         ids = [ObjectId(id) if not isinstance(id, ObjectId) else id for id in ids]
-        return self.cls.find({'_id': {'$in': ids}})
+        return self.find({'_id': {'$in': ids}})
 
     def find(self, *args, **kwargs):
         docs = self.cls._get_collection().find(*args, **kwargs)
