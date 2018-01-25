@@ -62,7 +62,7 @@ u.save()
 u.id
 # ObjectId('5a5ca86080a9b8291874f4db')
 
-u2 = User.find_one({'username': 'mp'})
+u2 = User.objects.find_one({'username': 'mp'})
 u2.gender = Gender.male
 u2.save()
 
@@ -71,7 +71,7 @@ u.gender
 # Gender.male
 
 # queries use the same syntax of pymongo and automatically return pyjo data models
-for user in User.find({'active': True}):
+for user in User.objects.find({'active': True}):
     print(user)
 # <User(username=mp)>
 ```
