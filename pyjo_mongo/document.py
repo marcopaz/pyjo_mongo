@@ -32,6 +32,13 @@ class DocManager(object):
             yield self.cls.from_dict(doc)
 
     def find_one(self, *args, **kwargs):
+        """
+        Finds and returns a single instance of the requested document class, matching the criteria provided
+        :param args: args sent to Mongo for filtering
+        :param kwargs: kwargs sent to Mongo for filtering
+        :return: The instance of document class requested or None, if not found
+        :rtype: cls
+        """
         doc = self.cls._get_collection().find_one(*args, **kwargs)
         if not doc:
             return doc
