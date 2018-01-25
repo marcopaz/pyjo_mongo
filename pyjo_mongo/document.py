@@ -1,9 +1,44 @@
 import pymongo
 from bson import ObjectId
-from pyjo import Model, Field
+from pyjo import Model, Field, ModelMetaclass
+from pymongo import ReturnDocument
+from six import with_metaclass
 
 
-class Document(Model):
+class DocumentMetaClass(ModelMetaclass):
+    def __new__(mcs, name, bases, attrs):
+        new_class = super(DocumentMetaClass, mcs).__new__(mcs, name, bases, attrs)
+        new_class.objects = DocManager(new_class)
+        return new_class
+
+
+class DocManager(object):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def with_id(self, id):
+        id = ObjectId(id) if not isinstance(id, ObjectId) else id
+        return self.cls.objects.find_one({'_id': id})
+
+    def with_ids(self, ids):
+        if not isinstance(ids, list):
+            raise Exception('argument must be a list')
+        ids = [ObjectId(id) if not isinstance(id, ObjectId) else id for id in ids]
+        return self.cls.find({'_id': {'$in': ids}})
+
+    def find(self, *args, **kwargs):
+        docs = self.cls._get_collection().find(*args, **kwargs)
+        for doc in docs:
+            yield self.cls.from_dict(doc)
+
+    def find_one(self, *args, **kwargs):
+        doc = self.cls._get_collection().find_one(*args, **kwargs)
+        if not doc:
+            return doc
+        return self.cls.from_dict(doc)
+
+
+class Document(with_metaclass(DocumentMetaClass, Model)):
     __meta__ = {}
     _indexes_created = False
 
@@ -84,35 +119,3 @@ class Document(Model):
         if not doc:
             raise Exception('trying to reload non-existent document')
         return self.update_from_dict(doc)
-
-    @classmethod
-    def with_id(cls, id):
-        id = ObjectId(id) if not isinstance(id, ObjectId) else id
-        return cls.find_one({'_id': id})
-
-    @classmethod
-    def with_ids(cls, ids):
-        if not isinstance(ids, list):
-            raise Exception('argument must be a list')
-        ids = [ObjectId(id) if not isinstance(id, ObjectId) else id for id in ids]
-        return cls.find({'_id': {'$in': ids}})
-
-    @classmethod
-    def find(cls, *args, **kwargs):
-        docs = cls._get_collection().find(*args, **kwargs)
-        for doc in docs:
-            yield cls.from_dict(doc)
-
-    @classmethod
-    def find_one(cls, *args, **kwargs):
-        """
-        Finds and returns a single instance of the requested document class, matching the criteria provided
-        :param args: args sent to Mongo for filtering
-        :param kwargs: kwargs sent to Mongo for filtering
-        :return: The instance of document class requested or None, if not found
-        :rtype: cls
-        """
-        doc = cls._get_collection().find_one(*args, **kwargs)
-        if not doc:
-            return doc
-        return cls.from_dict(doc)
