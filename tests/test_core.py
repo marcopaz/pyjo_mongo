@@ -83,6 +83,6 @@ def test_with_ids(user):
 
 
 def test_delete(user):
-    assert User._get_collection().count() == 1
+    assert User.objects.count() == 1
     user.delete()
-    assert User._get_collection().count() == 0
+    assert User.objects.count() == 0

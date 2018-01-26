@@ -1,7 +1,6 @@
 import pymongo
 from bson import ObjectId
 from pyjo import Model, Field, ModelMetaclass
-from pymongo import ReturnDocument
 from six import with_metaclass
 
 
@@ -43,6 +42,9 @@ class DocManager(object):
         if not doc:
             return doc
         return self.cls.from_dict(doc)
+
+    def count(self):
+        return self.cls._get_collection().count()
 
 
 class Document(with_metaclass(DocumentMetaClass, Model)):
