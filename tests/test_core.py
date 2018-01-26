@@ -86,3 +86,9 @@ def test_delete(user):
     assert User.objects.count() == 1
     user.delete()
     assert User.objects.count() == 0
+
+
+def test_no_results():
+    user = User.objects.find_one({'username': 'not_exists'})
+    assert user is None
+
