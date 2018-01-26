@@ -1,7 +1,9 @@
 import pytest
 from bson import ObjectId
+from pyjo import Field
 
-from .conftest import User, Gender, Address
+from pyjo_mongo import Document
+from .conftest import User, Gender, Address, db_connection, TEST_DB_NAME
 
 __author__ = 'gabriele'
 
@@ -92,3 +94,19 @@ def test_no_results():
     user = User.objects.find_one({'username': 'not_exists'})
     assert user is None
 
+
+def test_model_no_indexes():
+    class ModelWithNoIndexes(Document):
+        __meta__ = {
+            'db_connection': lambda: db_connection[TEST_DB_NAME],
+            'indexes': [],
+        }
+
+        foo = Field(type=str)
+
+    assert ModelWithNoIndexes.objects.count() == 0
+
+    t_model = ModelWithNoIndexes(foo='bar')
+    t_model.save()
+
+    assert ModelWithNoIndexes.objects.count() == 1

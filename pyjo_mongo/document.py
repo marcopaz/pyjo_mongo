@@ -114,7 +114,8 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
                 **kwargs,
             ))
 
-        return cls._get_collection(create_indexes=False).create_indexes(mongo_indexes)
+        if mongo_indexes:
+            return cls._get_collection(create_indexes=False).create_indexes(mongo_indexes)
 
     def save(self):
         _id = self._get_collection().save(self.to_dict())
