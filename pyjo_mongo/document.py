@@ -3,48 +3,14 @@ from bson import ObjectId
 from pyjo import Model, Field, ModelMetaclass
 from six import with_metaclass
 
+from pyjo_mongo.queryset import Queryset
+
 
 class DocumentMetaClass(ModelMetaclass):
     def __new__(mcs, name, bases, attrs):
         new_class = super(DocumentMetaClass, mcs).__new__(mcs, name, bases, attrs)
-        new_class.objects = DocManager(new_class)
+        new_class.objects = Queryset(new_class)
         return new_class
-
-
-class DocManager(object):
-    def __init__(self, cls):
-        self.cls = cls
-
-    def with_id(self, id):
-        id = ObjectId(id) if not isinstance(id, ObjectId) else id
-        return self.cls.objects.find_one({'_id': id})
-
-    def with_ids(self, ids):
-        if not isinstance(ids, list):
-            raise Exception('argument must be a list')
-        ids = [ObjectId(id) if not isinstance(id, ObjectId) else id for id in ids]
-        return self.find({'_id': {'$in': ids}})
-
-    def find(self, *args, **kwargs):
-        docs = self.cls._get_collection().find(*args, **kwargs)
-        for doc in docs:
-            yield self.cls.from_dict(doc)
-
-    def find_one(self, *args, **kwargs):
-        """
-        Finds and returns a single instance of the requested document class, matching the criteria provided
-        :param args: args sent to Mongo for filtering
-        :param kwargs: kwargs sent to Mongo for filtering
-        :return: The instance of document class requested or None, if not found
-        :rtype: cls
-        """
-        doc = self.cls._get_collection().find_one(*args, **kwargs)
-        if not doc:
-            return doc
-        return self.cls.from_dict(doc)
-
-    def count(self):
-        return self.cls._get_collection().count()
 
 
 class Document(with_metaclass(DocumentMetaClass, Model)):

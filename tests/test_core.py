@@ -9,6 +9,29 @@ __author__ = 'gabriele'
 
 
 @pytest.fixture()
+def users():
+    for index in range(5):
+        User(
+            username='test{}'.format(index),
+            first_name='guy',
+            last_name='bar',
+            age=index + 18,
+            gender=Gender.male,
+        ).save()
+
+    for index in range(5):
+        User(
+            username='foo{}'.format(index),
+            first_name='girl',
+            last_name='bar',
+            age=index + 18,
+            gender=Gender.female,
+        ).save()
+
+    return User.objects.find()
+
+
+@pytest.fixture()
 def user():
     user = User(
         username='test',
@@ -110,3 +133,17 @@ def test_model_no_indexes():
     t_model.save()
 
     assert ModelWithNoIndexes.objects.count() == 1
+
+
+def test_queryset_chaining(users):
+    assert User.objects.count() == 10
+    assert User.objects.find({'gender': Gender.male.name}).count() == 5
+    assert User.objects.find({'gender': Gender.female.name}).count() == 5
+
+
+def test_can_iterate_results(users):
+    count = 0
+    for u in User.objects.find({'gender': Gender.male.name}):
+        assert u.gender is Gender.male
+        count += 1
+    assert count == 5
