@@ -39,6 +39,9 @@ class Queryset(object):
         if data:
             return self.cls.from_dict(data)
 
+    def sort(self, *args, **kwargs):
+        return Queryset(cls=self.cls, cursor=self.cursor.sort(*args, **kwargs))
+
     def count(self):
         return self.cursor.count()
 
