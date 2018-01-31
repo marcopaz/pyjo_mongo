@@ -1,3 +1,4 @@
+import pymongo
 import pytest
 from bson import ObjectId
 from pyjo import Field
@@ -147,3 +148,21 @@ def test_can_iterate_results(users):
         assert u.gender is Gender.male
         count += 1
     assert count == 5
+
+
+def test_sorting_ascending(users):
+    users = User.objects.find({'gender': Gender.male.name}).order_by('age')
+    assert users.count() == 5
+    assert [u.age for u in users] == [18, 19, 20, 21, 22]
+
+
+def test_sorting_descending(users):
+    users = User.objects.find({'gender': Gender.male.name}).order_by('-age')
+    assert users.count() == 5
+    assert [u.age for u in users] == [22, 21, 20, 19, 18]
+
+
+def test_sorting_multiple(users):
+    users = User.objects.find().order_by('gender', '-age')
+    assert users.count() == 10
+    assert [u.age for u in users] == [22, 21, 20, 19, 18, 22, 21, 20, 19, 18]

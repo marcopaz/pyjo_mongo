@@ -42,7 +42,25 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
         return cls._db_connection()[cls._collection_name()]
 
     @classmethod
-    def _create_indexes(cls, check_if_fields_exist=True):
+    def _minus_fields_to_pymongo_couples(cls, *fields):
+        pymongo_tuples = []
+        for field in fields:
+            if not isinstance(field, str):
+                raise Exception('invalid field')
+
+            if field[0] == '-':
+                field = field[1:]
+                pymongo_tuples.append((field, pymongo.DESCENDING))
+            else:
+                pymongo_tuples.append((field, pymongo.ASCENDING))
+
+            if field not in cls._fields:
+                raise Exception('Field "{}" used in index is not declared in the model'.format(field))
+
+        return pymongo_tuples
+
+    @classmethod
+    def _create_indexes(cls):
         indexes = cls.__meta__.get('indexes', [])
         all_background = cls.__meta__.get('index_background', False)
 
@@ -61,21 +79,10 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
             else:
                 raise Exception('invalid index')
 
-            mongo_fields = []
-            for field in fields:
-                if not isinstance(field, str):
-                    raise Exception('invalid index field')
-                if field[0] == '-':
-                    field = field[1:]
-                    mongo_fields.append((field, pymongo.DESCENDING))
-                else:
-                    mongo_fields.append((field, pymongo.ASCENDING))
-
-                if check_if_fields_exist and field not in cls._fields:
-                    raise Exception('Field "{}" used in index is not declared in the model'.format(field))
+            pymongo_tuples = cls._minus_fields_to_pymongo_couples(*fields)
 
             mongo_indexes.append(pymongo.IndexModel(
-                mongo_fields,
+                pymongo_tuples,
                 background=background,
                 **kwargs,
             ))

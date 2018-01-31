@@ -39,6 +39,9 @@ class Queryset(object):
         if data:
             return self.cls.from_dict(data)
 
+    def order_by(self, *args):
+        return Queryset(cls=self.cls, cursor=self.cursor.sort(self.cls._minus_fields_to_pymongo_couples(*args)))
+
     def count(self):
         return self.cursor.count()
 

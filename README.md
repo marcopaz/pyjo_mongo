@@ -62,6 +62,9 @@ u.save()
 u.id
 # ObjectId('5a5ca86080a9b8291874f4db')
 
+# objects is a class property built around a pymongo Cursor
+# and will allow you to perform basic operations
+
 u2 = User.objects.find_one({'username': 'mp'})
 u2.gender = Gender.male
 u2.save()
@@ -74,5 +77,12 @@ u.gender
 for user in User.objects.find({'active': True}):
     print(user)
 # <User(username=mp)>
+
+# You can perform ordering operations on querysets
+for user in User.objects.order_by('gender', '-age'):
+    print(user.username)
+    print(user.age)
+
+
 ```
 
