@@ -166,3 +166,10 @@ def test_sorting_multiple(users):
     users = User.objects.find().order_by('gender', '-age')
     assert users.count() == 10
     assert [u.age for u in users] == [22, 21, 20, 19, 18, 22, 21, 20, 19, 18]
+
+
+def test_slicing(users):
+    users = list(User.objects.find().order_by('gender', '-age')[:5])
+    assert len(users) == 5
+    assert [user.age for user in users] == [22, 21, 20, 19, 18]
+    assert User.objects.find().order_by('-age')[0].age == 22

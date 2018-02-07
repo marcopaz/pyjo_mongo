@@ -46,6 +46,8 @@ class Queryset(object):
         return self.cursor.count()
 
     def __getitem__(self, item):
+        if isinstance(item, slice):
+            return Queryset(cls=self.cls, cursor=self.cursor.__getitem__(item))
         return self.cls.from_dict(self.cursor[item])
 
     def __iter__(self):
