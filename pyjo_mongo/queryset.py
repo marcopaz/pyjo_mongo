@@ -45,6 +45,12 @@ class Queryset(object):
     def count(self):
         return self.cursor.count()
 
+    def skip(self, *args, **kwargs):
+        return Queryset(cls=self.cls, cursor=self.cursor.skip(*args, **kwargs))
+
+    def limit(self, *args, **kwargs):
+        return Queryset(cls=self.cls, cursor=self.cursor.limit(*args, **kwargs))
+
     def __getitem__(self, item):
         if isinstance(item, slice):
             return Queryset(cls=self.cls, cursor=self.cursor.__getitem__(item))
