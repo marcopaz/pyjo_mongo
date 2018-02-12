@@ -173,3 +173,10 @@ def test_slicing(users):
     assert len(users) == 5
     assert [user.age for user in users] == [22, 21, 20, 19, 18]
     assert User.objects.find().order_by('-age')[0].age == 22
+
+
+def test_skip_and_limit(users):
+    users = User.objects.find().order_by('gender', '-age').skip(1).limit(4)
+    assert users.count() == 10
+    assert [user.age for user in users] == [21, 20, 19, 18]
+    assert User.objects.find().order_by('-age')[0].age == 22
