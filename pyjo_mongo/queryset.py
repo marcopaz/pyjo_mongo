@@ -51,6 +51,16 @@ class Queryset(object):
     def limit(self, *args, **kwargs):
         return Queryset(cls=self.cls, cursor=self.cursor.limit(*args, **kwargs))
 
+    def delete(self):
+        if self._cursor is None:
+            # Drop the whole collection
+            self.cls._get_collection().remove()
+        else:
+            # We rewind both before and after the function because we need to iterate the cursor ourselves
+            self.cursor.rewind()
+            self.cls._get_collection().delete_many({"_id": {"$in": [el['_id'] for el in self.cursor]}})
+            self.cursor.rewind()
+
     def __getitem__(self, item):
         if isinstance(item, slice):
             return Queryset(cls=self.cls, cursor=self.cursor.__getitem__(item))

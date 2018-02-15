@@ -180,3 +180,21 @@ def test_skip_and_limit(users):
     assert users.count() == 10
     assert [user.age for user in users] == [21, 20, 19, 18]
     assert User.objects.find().order_by('-age')[0].age == 22
+
+
+def test_queryset_delete(users):
+    all_ids = {u.id for u in User.objects.find()}
+    users = User.objects.find().order_by('gender', '-age').skip(1).limit(4)
+    assert users.count() == 10
+    deleted_ids = {u.id for u in users}
+
+    users.delete()
+
+    after_deleting_ids = {u.id for u in User.objects.find()}
+    assert after_deleting_ids == all_ids - deleted_ids
+
+
+def test_queryset_delete_all(users):
+    assert User.objects.count() == 10
+    User.objects.delete()
+    assert User.objects.count() == 0
