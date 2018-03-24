@@ -56,7 +56,20 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
         return cls._db_connection()[cls._collection_name()]
 
     @classmethod
-    def _minus_fields_to_pymongo_couples(cls, *fields):
+    def key_path_is_valid(cls, key_path):
+        fields = cls._fields
+        for key in key_path.split('.'):
+            if key not in fields:
+                return False
+            field = fields[key]
+            if isinstance(field._type, Model):
+                fields = field._type._fields
+            else:
+                break
+        return True
+
+    @classmethod
+    def _minus_fields_to_pymongo_couples(cls, fields):
         pymongo_tuples = []
         for field in fields:
             if not isinstance(field, str):
@@ -67,9 +80,6 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
                 pymongo_tuples.append((field, pymongo.DESCENDING))
             else:
                 pymongo_tuples.append((field, pymongo.ASCENDING))
-
-            if field not in cls._fields:
-                raise Exception('Field "{}" used in index is not declared in the model'.format(field))
 
         return pymongo_tuples
 
@@ -93,7 +103,12 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
             else:
                 raise Exception('invalid index')
 
-            pymongo_tuples = cls._minus_fields_to_pymongo_couples(*fields)
+            pymongo_tuples = cls._minus_fields_to_pymongo_couples(fields)
+
+            if not cls.__meta__.get('skip_index_validation'):
+                for field, _ in pymongo_tuples:
+                    if not cls.key_path_is_valid(field):
+                        raise Exception('Field "{}" used in index is not declared in the model'.format(field))
 
             mongo_indexes.append(pymongo.IndexModel(
                 pymongo_tuples,

@@ -1,7 +1,7 @@
 import pymongo
 import pytest
 from bson import ObjectId
-from pyjo import Field
+from pyjo import Field, Model
 
 from pyjo_mongo import Document
 from .conftest import User, Gender, Address, db_connection, TEST_DB_NAME
@@ -134,6 +134,30 @@ def test_model_no_indexes():
     t_model.save()
 
     assert ModelWithNoIndexes.objects.count() == 1
+
+
+def test_model_embedded_index():
+    class Embedded(Model):
+        value = Field(type=int)
+
+    class ModelWithEmbeddedIndex(Document):
+        __meta__ = {
+            'db_connection': lambda: db_connection[TEST_DB_NAME],
+            'indexes': [
+                {
+                    'fields': ['embedded.value'],
+                },
+            ]
+        }
+
+        embedded = Field(type=Embedded)
+
+    assert ModelWithEmbeddedIndex.objects.count() == 0
+
+    t_model = ModelWithEmbeddedIndex(embedded=Embedded(value=2))
+    t_model.save()
+
+    assert ModelWithEmbeddedIndex.objects.count() == 1
 
 
 def test_meta_validation():
