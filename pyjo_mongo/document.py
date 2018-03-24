@@ -7,7 +7,21 @@ from pyjo_mongo.queryset import Queryset
 
 
 class DocumentMetaClass(ModelMetaclass):
+
+    @classmethod
+    def validate_meta(cls, meta):
+        valid_keys = [
+            'db_connection',
+            'collection_name',
+            'indexes',
+            'index_background',
+            'skip_index_validation',
+        ]
+        if set(meta.keys()) - set(valid_keys):
+            raise Exception('Invalid meta attributes: {}'.format(list(set(meta.keys()) - set(valid_keys))))
+
     def __new__(mcs, name, bases, attrs):
+        mcs.validate_meta(attrs['__meta__'])
         new_class = super(DocumentMetaClass, mcs).__new__(mcs, name, bases, attrs)
         new_class.objects = Queryset(new_class)
         return new_class

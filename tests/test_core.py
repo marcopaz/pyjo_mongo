@@ -136,6 +136,23 @@ def test_model_no_indexes():
     assert ModelWithNoIndexes.objects.count() == 1
 
 
+def test_meta_validation():
+    with pytest.raises(Exception) as err:
+        class ModelWithWrongMeta(Document):
+            __meta__ = {
+                'db_connection_mispelled': lambda: db_connection[TEST_DB_NAME],
+                'indexes': [
+                    {
+                        'fields': ['embedded.value'],
+                    },
+                ]
+            }
+
+            value = Field(type=int)
+
+    assert str(err.value) == "Invalid meta attributes: ['db_connection_mispelled']"
+
+
 def test_queryset_chaining(users):
     assert User.objects.count() == 10
     assert User.objects.find({'gender': Gender.male.name}).count() == 5
