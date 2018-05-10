@@ -119,6 +119,11 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
         if mongo_indexes:
             return cls._get_collection(create_indexes=False).create_indexes(mongo_indexes)
 
+    @classmethod
+    def drop(cls):
+        cls._get_collection().drop()
+        cls._indexes_created = False
+
     def save(self):
         _id = self._get_collection().save(self.to_dict())
         self._id = _id
