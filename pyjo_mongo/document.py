@@ -113,7 +113,7 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
             mongo_indexes.append(pymongo.IndexModel(
                 pymongo_tuples,
                 background=background,
-                **kwargs,
+                **kwargs
             ))
 
         if mongo_indexes:
@@ -130,7 +130,9 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
         return self
 
     def delete(self):
-        self._get_collection().delete_one(self.to_dict())
+        if not self._id:
+            raise Exception('called delete a document without _id')
+        self._get_collection().delete_one({'_id': self._id})
         self._id = None
         return self
 
