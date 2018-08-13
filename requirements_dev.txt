@@ -1,0 +1,3 @@
+pyjo
+pymongo
+pytest

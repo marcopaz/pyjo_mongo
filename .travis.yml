@@ -1,8 +1,10 @@
 language: python
 python:
 - '3.5'
+install:
+- pip install -r requirements_dev.txt
 script:
-- python setup.py test
+- pytest
 deploy:
   provider: pypi
   user: map
