@@ -12,6 +12,9 @@ class Queryset(object):
     def cursor(self):
         return self._cursor or self.cls._get_collection()
 
+    def delete(self):
+        self.cls._get_collection().delete_many({})
+
     def with_id(self, id):
         id = ObjectId(id) if not isinstance(id, ObjectId) else id
         return self.find_one({'_id': id})
