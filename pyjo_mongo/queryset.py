@@ -51,6 +51,9 @@ class Queryset(object):
     def limit(self, *args, **kwargs):
         return Queryset(cls=self.cls, cursor=self.cursor.limit(*args, **kwargs))
 
+    def to_list(self):
+        return list(self)
+
     def __getitem__(self, item):
         if isinstance(item, slice):
             return Queryset(cls=self.cls, cursor=self.cursor.__getitem__(item))
