@@ -2,6 +2,7 @@ import pymongo
 import pytest
 from bson import ObjectId
 from pyjo import Field, Model
+from six import next
 
 from pyjo_mongo import Document
 from .conftest import User, Gender, Address, db_connection, TEST_DB_NAME
@@ -221,3 +222,14 @@ def test_skip_and_limit(users):
     assert users.count() == 10
     assert [user.age for user in users] == [21, 20, 19, 18]
     assert User.objects.find().order_by('-age')[0].age == 22
+
+
+def test_next(users):
+    users = User.objects.find({'gender': Gender.male.name}).order_by('-age')
+    assert users.count() == 5
+
+    user = next(users)
+    assert user.age == 22
+
+    user = next(users)
+    assert user.age == 21
