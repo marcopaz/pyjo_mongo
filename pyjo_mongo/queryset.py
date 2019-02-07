@@ -64,4 +64,4 @@ class Queryset(object):
             yield self.cls.from_dict(element)
 
     def __next__(self):
-        return self.cls.from_dict(self.cursor.__next___())
+        return self.cls.from_dict(self.cursor.__next__())
