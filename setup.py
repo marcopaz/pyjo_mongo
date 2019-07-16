@@ -14,6 +14,7 @@ setup(
     url='https://github.com/marcopaz/pyjo_mongo',
     download_url='https://github.com/marcopaz/pyjo_mongo/archive/{}.tar.gz'.format(version),
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     author='Marco Pazzaglia',
     author_email='marco@pazzaglia.me',
     packages=find_packages(),
