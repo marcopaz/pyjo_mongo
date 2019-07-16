@@ -161,6 +161,32 @@ def test_model_embedded_index():
     assert ModelWithEmbeddedIndex.objects.count() == 1
 
 
+def test_model_with_pymongo_fields():
+
+    class SimpleModel(Document):
+        __meta__ = {
+            'db_connection': lambda: db_connection[TEST_DB_NAME],
+            'indexes': [
+                {
+                    'fields': [
+                        ('foo', pymongo.TEXT),
+                    ],
+
+                    'default_language': 'english',
+                },
+            ]
+        }
+
+        foo = Field(type=str)
+
+    assert SimpleModel.objects.count() == 0
+
+    t_model = SimpleModel(foo='bar')
+    t_model.save()
+
+    assert SimpleModel.objects.count() == 1
+
+
 def test_meta_validation():
     with pytest.raises(Exception) as err:
         class ModelWithWrongMeta(Document):

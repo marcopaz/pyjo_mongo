@@ -72,6 +72,16 @@ class Document(with_metaclass(DocumentMetaClass, Model)):
     def _minus_fields_to_pymongo_couples(cls, fields):
         pymongo_tuples = []
         for field in fields:
+
+            # check if field is already in pymongo format
+            if isinstance(field, tuple):
+                if not isinstance(field[0], str) or len(field) != 2:
+                    raise Exception('invalid field')
+                pymongo_tuples.append(field)
+                continue
+
+            # assume field is in pyjo format
+
             if not isinstance(field, str):
                 raise Exception('invalid field')
 
